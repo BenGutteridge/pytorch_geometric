@@ -106,7 +106,7 @@ share:
   dim_out: 1
   num_splits: 1
 tensorboard_agg: true
-tensorboard_each_run: false
+tensorboard_each_run: true
 train:
   auto_resume: false
   batch_size: 128
