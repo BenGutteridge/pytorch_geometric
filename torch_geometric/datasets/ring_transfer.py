@@ -13,7 +13,7 @@ from torch_geometric.utils import coalesce, remove_self_loops, to_undirected
 from torch_geometric.transforms import RandomNodeSplit
 from torch_geometric.graphgym.config import cfg
 
-from ben_utils import get_k_hop_adjacencies
+from torch_geometric.graphgym.utils.ben_utils import get_k_hop_adjacencies
 
 
 class RingTransferDataset(InMemoryDataset):
