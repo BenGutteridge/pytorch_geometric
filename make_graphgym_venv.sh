@@ -2,9 +2,9 @@
 
 # generate graphgym-ready venv and dependencies
 
-# conda update conda
-# conda create -n graphgym_v0
-# conda activate graphgym_v0
+conda update conda
+conda create -n graphgym_X
+conda activate graphgym_X
 
 # # Mac (CPU only)
 conda install pytorch torchvision torchaudio -c pytorch
@@ -26,3 +26,5 @@ pip install yacs
 pip install ogb
 pip install tensorboard
 pip install tensorboardX
+pip install rdkit
+pip install networkx
