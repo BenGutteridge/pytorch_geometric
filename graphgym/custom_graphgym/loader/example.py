@@ -52,12 +52,6 @@ import torch
 
 from torch_geometric.graphgym.config import cfg
 
-def make_khop_adjacencies(dataset, K):
-    #########
-    # STUFF #
-    #########
-    return dataset
-
 @register_loader('my_ogb_loader')
 def load_ogb(format, name, dataset_dir):
     r"""
