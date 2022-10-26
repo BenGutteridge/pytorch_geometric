@@ -36,7 +36,7 @@ gnn:
 optim:
   optimizer: adam
   base_lr: 0.01
-  max_epoch: 10
+  max_epoch: 50
 ring_dataset:
   num_nodes: 10
   num_graphs: 2000

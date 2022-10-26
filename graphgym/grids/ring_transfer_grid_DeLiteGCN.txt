@@ -1,0 +1,12 @@
+# Format for each row: name in config.py; alias; range to search
+# No spaces, except between these 3 fields
+# Line breaks are used to union different grid search spaces
+# Feel free to add '#' to add comments
+
+
+# Settings for the RingTransfer experiment
+ring_dataset.num_nodes num_nodes [10,12,14,16,18,20,22,24,26,28,30]
+gnn.layer_type layer_type ['my_gcnconv']
+gnn.stage_type stage_type ['delite_gnn']
+accelerator accelerator ['cuda']
+num_workers num_workers [8]
