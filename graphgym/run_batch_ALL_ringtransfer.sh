@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 CONFIG=${CONFIG:-ring_transfer} # name of file
-GRID=${GRID:-ring_transfer_grid_GPU_DELAY}
+GRID=${GRID:-ALL_ring_transfer_grid}
 REPEAT=${REPEAT:-3}
 MAX_JOBS=${MAX_JOBS:-8}
 SLEEP=${SLEEP:-1}
