@@ -25,6 +25,6 @@ num_workers num_workers [8]
 
 ring_dataset.num_nodes num_nodes [10,12,14,16,18,20,22,24,26,28,30]
 gnn.layer_type layer_type ['my_gcnconv']
-gnn.stage_type stage_type ['delite_gcn']
+gnn.stage_type stage_type ['delite_gnn']
 accelerator accelerator ['cuda']
 num_workers num_workers [8]

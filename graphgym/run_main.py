@@ -45,7 +45,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('opts', default=None, nargs=argparse.REMAINDER,
                         help='See graphgym/config.py for remaining options.')
 
-    return parser.parse_args("--cfg {} --repeat {} optim.max_epoch 1 gnn.layers_mp 15".format(argpath, repeat).split())
+    return parser.parse_args("--cfg {} --repeat {} optim.max_epoch 1 ring_dataset.num_nodes 14 gnn.layer_type my_gcnconv gnn.stage_type delite_gnn".format(argpath, repeat).split())
     
 
 if __name__ == '__main__':
