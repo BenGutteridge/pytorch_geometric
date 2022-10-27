@@ -44,8 +44,16 @@ def parse_args() -> argparse.Namespace:
                         help='Mark yaml as done after a job has finished.')
     parser.add_argument('opts', default=None, nargs=argparse.REMAINDER,
                         help='See graphgym/config.py for remaining options.')
-
-    return parser.parse_args("--cfg {} --repeat {} optim.max_epoch 1 ring_dataset.num_nodes 14 gnn.layer_type my_gcnconv gnn.stage_type delite_gnn".format(argpath, repeat).split())
+    extra_args = [
+        'optim.max_epoch 5',
+        'ring_dataset.num_nodes 20',
+        'dataset.transductive True',
+        # 'gnn.layer_type gcnconv',
+        'gnn.layer_type my_gcnconv',
+        'gnn.stage_type delite_gnn'
+        ]
+    extra_args = ' '.join(extra_args)
+    return parser.parse_args("--cfg {} --repeat {} {}".format(argpath, repeat, extra_args).split())
     
 
 if __name__ == '__main__':

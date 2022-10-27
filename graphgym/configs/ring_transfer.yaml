@@ -22,12 +22,12 @@ model:
   graph_pooling: add
 gnn:
   layers_pre_mp: 1
-  # layers_mp: 4 # IF BLANK, determined by length of ring -- floor(n_nodes/2)
+  layers_mp: 1 # IF BLANK, determined by length of ring -- floor(n_nodes/2)
   # layers_post_mp: 1 # custom head only allows for one layer
   head: ring_transfer           # *
   dim_inner: 256
-  layer_type: my_gcnconv  # generalconv
-  stage_type: delay_gnn   # stack
+  layer_type: generalconv
+  stage_type: stack
   batchnorm: true
   act: prelu
   dropout: 0.0

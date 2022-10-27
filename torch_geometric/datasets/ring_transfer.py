@@ -122,27 +122,26 @@ class RingTransferDataset(InMemoryDataset):
         # Add the label of the graph as a graph label
         y = torch.tensor([np.argmax(target_label)], dtype=torch.long)
         
-        k_hop_edges, _ = get_k_hop_adjacencies(edge_index, cfg.delay.max_k)
-        assert torch.mean((k_hop_edges[0] == edge_index).float())==1.0
-        cutoffs = torch.tensor([v.shape[-1] for v in k_hop_edges])
-        k_hop_edges = torch.cat(k_hop_edges, dim=1)
-        # cutoffs = [int(sum(cutoffs[:i])) for i in range(len(cutoffs))] 
-        # cutoffs += [int(k_hop_edges.shape[-1])]
+        if cfg.gnn.stage_type in ['k_gnn', 'delay_gnn', 'delite_gnn']:
+            k_hop_edges, _ = get_k_hop_adjacencies(edge_index, cfg.delay.max_k)
+            assert torch.mean((k_hop_edges[0] == edge_index).float())==1.0
+            cutoffs = torch.tensor([v.shape[-1] for v in k_hop_edges])
+            k_hop_edges = torch.cat(k_hop_edges, dim=1)
             
         
-        # make edge labels for k-hops
-        k_hop_labels = []
-        for i in range(len(cutoffs)):
-            k = i + 1
-            k_hop_labels.append(k * torch.ones(cutoffs[i]))
-        k_hop_labels = torch.cat(k_hop_labels)
+            # make edge labels for k-hops
+            k_hop_labels = []
+            for i in range(len(cutoffs)):
+                k = i + 1
+                k_hop_labels.append(k * torch.ones(cutoffs[i]))
+            k_hop_labels = torch.cat(k_hop_labels)
             
-        
-        return Data(x=x, edge_index=k_hop_edges, 
-                    edge_attr=k_hop_labels,
-                    mask=mask, y=y,
+            return Data(x=x, edge_index=k_hop_edges, 
+                        edge_attr=k_hop_labels,
+                        mask=mask, y=y,
+                        )
+        elif cfg.gnn.stage_type == 'stack':
+            return Data(x=x, edge_index=edge_index, mask=mask, y=y)
+        else:
+            raise NotImplementedError("Stage not yet supported.")
 
-                    # k_hop_edges=k_hop_edges, 
-                    # test_edge_idx=torch.arange(22).reshape((2,-1)),
-                    # test_list=[torch.arange(4).reshape((2,-1)) for _ in range(5)],
-                    )
