@@ -26,3 +26,5 @@ coverage.xml
 
 !torch_geometric/data/
 !test/data/
+
+# torch_geometric/graphgym/results/
