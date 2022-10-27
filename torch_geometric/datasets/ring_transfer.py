@@ -41,9 +41,9 @@ class RingTransferDataset(InMemoryDataset):
     """
     def __init__(
         self,
-        num_graphs: int = 100000,
-        num_nodes: int = 10,
-        num_classes: int = 5,
+        num_graphs,
+        num_nodes,
+        num_classes,
         # task: str = "auto",
         transform: Optional[Callable] = None,
         pre_transform: Optional[Callable] = None,
