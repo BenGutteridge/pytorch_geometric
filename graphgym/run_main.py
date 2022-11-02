@@ -46,11 +46,12 @@ def parse_args() -> argparse.Namespace:
                         help='See graphgym/config.py for remaining options.')
     extra_args = [
         'optim.max_epoch 5',
-        'ring_dataset.num_nodes 20',
+        'ring_dataset.num_nodes 10',
         'dataset.transductive True',
         # 'gnn.layer_type gcnconv',
-        'gnn.layer_type my_gcnconv',
-        'gnn.stage_type delite_gnn'
+        # 'gnn.layer_type my_gcnconv',
+        # 'gnn.stage_type delay_gnn'
+        'beta 3',
         ]
     extra_args = ' '.join(extra_args)
     return parser.parse_args("--cfg {} --repeat {} {}".format(argpath, repeat, extra_args).split())
