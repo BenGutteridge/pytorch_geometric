@@ -5,6 +5,24 @@ import torch_geometric
 import networkx as nx
 
 
+# K <= BETA ADJACENCIES
+def get_k_leq_beta_adj(edge_index, beta):
+  """Return k <= beta - hop adjacency matrix"""
+  try:
+    tmp = to_dense_adj(edge_index).float()
+  except:
+    print('Offending tensor:\nedge_index:\n', edge_index, '\nedge_index.shape:', edge_index.shape)
+  adj = tmp.to_sparse().float()
+  for k in range(2, beta+1):
+    tmp += torch.bmm(adj, tmp)
+  for i in range(tmp.shape[-1]):
+    tmp[0, i, i] = 0 # remove self-connections
+  tmp = (tmp>0).float() # remove edge multiples
+  edge_idx, _ = dense_to_sparse(tmp)
+  return edge_idx
+
+#######################
+
 def get_k_hop_adjacencies(edge_index, max_k, stack_edge_indices=False):
   """Return list of matrices/edge indices for 1,..,k-hop adjacency matrices
   n.b. binary matrix

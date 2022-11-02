@@ -467,6 +467,7 @@ def set_cfg(cfg):
     cfg.ring_dataset.num_nodes = 10
     cfg.ring_dataset.num_graphs = 6000
     cfg.ring_dataset.num_classes = 5
+    cfg.ring_dataset.beta = 1 # beta, for betaGCN. Reverts to GCN for beta=1
 
 
 def assert_cfg(cfg):

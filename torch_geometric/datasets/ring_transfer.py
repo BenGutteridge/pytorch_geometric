@@ -13,7 +13,7 @@ from torch_geometric.utils import coalesce, remove_self_loops, to_undirected
 from torch_geometric.transforms import RandomNodeSplit
 from torch_geometric.graphgym.config import cfg
 
-from torch_geometric.graphgym.utils.ben_utils import get_k_hop_adjacencies
+from torch_geometric.graphgym.utils.ben_utils import get_k_hop_adjacencies, get_k_leq_beta_adj
 
 
 class RingTransferDataset(InMemoryDataset):
@@ -122,7 +122,7 @@ class RingTransferDataset(InMemoryDataset):
         # Add the label of the graph as a graph label
         y = torch.tensor([np.argmax(target_label)], dtype=torch.long)
         
-        if cfg.gnn.stage_type in ['k_gnn', 'delay_gnn', 'delite_gnn']:
+        if cfg.gnn.stage_type in ['k_gnn', 'delay_gnn', 'delite_gnn', 'alpha_k_gnn']:
             k_hop_edges, _ = get_k_hop_adjacencies(edge_index, cfg.delay.max_k)
             assert torch.mean((k_hop_edges[0] == edge_index).float())==1.0
             cutoffs = torch.tensor([v.shape[-1] for v in k_hop_edges])
@@ -141,6 +141,9 @@ class RingTransferDataset(InMemoryDataset):
                         mask=mask, y=y,
                         )
         elif cfg.gnn.stage_type == 'stack':
+            if cfg.ring_dataset.beta > 1:
+                print('Using betaGCN, beta = %d'%cfg.ring_dataset.beta)
+                edge_index = get_k_leq_beta_adj(edge_index, beta=cfg.ring_dataset.beta)
             return Data(x=x, edge_index=edge_index, mask=mask, y=y)
         else:
             raise NotImplementedError("Stage not yet supported.")

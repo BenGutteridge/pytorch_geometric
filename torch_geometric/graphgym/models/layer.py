@@ -265,7 +265,6 @@ class GCNConv(nn.Module):
         batch.x = self.model(batch.x, batch.edge_index)
         return batch
 
-
 @register_layer('sageconv')
 class SAGEConv(nn.Module):
     """
