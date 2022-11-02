@@ -142,7 +142,7 @@ class RingTransferDataset(InMemoryDataset):
                         )
         elif cfg.gnn.stage_type == 'stack':
             if cfg.ring_dataset.beta > 1:
-                print('Using betaGCN, beta = %d'%cfg.ring_dataset.beta)
+                # print('Using betaGCN, beta = %d'%cfg.ring_dataset.beta)
                 edge_index = get_k_leq_beta_adj(edge_index, beta=cfg.ring_dataset.beta)
             return Data(x=x, edge_index=edge_index, mask=mask, y=y)
         else:
