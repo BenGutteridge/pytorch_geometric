@@ -51,7 +51,7 @@ def parse_args() -> argparse.Namespace:
         # 'gnn.layer_type gcnconv',
         # 'gnn.layer_type my_gcnconv',
         # 'gnn.stage_type delay_gnn'
-        'beta 3',
+        'ring_dataset.beta 3',
         ]
     extra_args = ' '.join(extra_args)
     return parser.parse_args("--cfg {} --repeat {} {}".format(argpath, repeat, extra_args).split())
