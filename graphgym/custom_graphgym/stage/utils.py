@@ -37,3 +37,16 @@ def init_khop_LiteGCN(model, dim_in, dim_out, num_layers):
   model.nu = nn.ParameterDict(nu)
 
   return model
+
+def init_khop_nondynamic_GCN(model, dim_in, dim_out, num_layers):
+  """For the non-dynamic k-hop model: alpha_k_gnn.
+  W_t, alpha_k (sums to 1)"""
+  model.num_layers = num_layers
+  model.max_k = cfg.gnn.layers_mp # cfg.delay.max_k
+  # make the W_k
+  W = []
+  for t in range(num_layers):
+      W.append(GNNLayer(dim_in, dim_out))
+  model.W = nn.ModuleList(W)
+  model.alpha = nn.parameter.Parameter(torch.ones(model.max_k)/model.max_k)
+  return model
