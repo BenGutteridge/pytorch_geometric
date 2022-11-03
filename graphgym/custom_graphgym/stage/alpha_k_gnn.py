@@ -23,7 +23,8 @@ class AlphaKGNNStage(nn.Module):
         # W_t only, not W_{k,t}
         # alpha_k sums to 1 and weights Sk
         # all Sk used at every layer - nondynamic
-        self = init_khop_nondynamic_GCN(self, dim_in, dim_out, num_layers) # needs learned alpha_k
+        self = init_khop_nondynamic_GCN(self, dim_in, dim_out, num_layers,
+                                        fixed_alpha=cfg.ring_dataset.fixed_alpha) # needs learned alpha_k
 
     def forward(self, batch):
         """

@@ -38,7 +38,8 @@ def init_khop_LiteGCN(model, dim_in, dim_out, num_layers):
 
   return model
 
-def init_khop_nondynamic_GCN(model, dim_in, dim_out, num_layers):
+
+def init_khop_nondynamic_GCN(model, dim_in, dim_out, num_layers, fixed_alpha=False):
   """For the non-dynamic k-hop model: alpha_k_gnn.
   W_t, alpha_k (sums to 1)"""
   model.num_layers = num_layers
@@ -48,5 +49,10 @@ def init_khop_nondynamic_GCN(model, dim_in, dim_out, num_layers):
   for t in range(num_layers):
       W.append(GNNLayer(dim_in, dim_out))
   model.W = nn.ModuleList(W)
-  model.alpha = nn.parameter.Parameter(torch.ones(model.max_k)/model.max_k)
+  if fixed_alpha:
+    print('Using fixed alpha model.')
+    model.alpha = torch.ones(model.max_k) # 1-vector
+  else:
+    print('Using learnable sum-to-1 alpha model.')
+    model.alpha = nn.parameter.Parameter(torch.ones(model.max_k)/model.max_k)
   return model
