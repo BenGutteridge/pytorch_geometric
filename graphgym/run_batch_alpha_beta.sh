@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 CONFIG=${CONFIG:-ring_transfer} # name of file
-GRID=${GRID:-alpha_beta_grid}
+GRID=${GRID:-alpha_beta_grid_v2}
 REPEAT=${REPEAT:-1}
 MAX_JOBS=${MAX_JOBS:-8}
 SLEEP=${SLEEP:-1}
