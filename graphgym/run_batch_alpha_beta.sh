@@ -2,7 +2,7 @@
 
 CONFIG=${CONFIG:-ring_transfer} # name of file
 GRID=${GRID:-alpha_beta_grid}
-REPEAT=${REPEAT:-3}
+REPEAT=${REPEAT:-1}
 MAX_JOBS=${MAX_JOBS:-8}
 SLEEP=${SLEEP:-1}
 MAIN=${MAIN:-main}
