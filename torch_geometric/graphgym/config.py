@@ -1,24 +1,19 @@
-import functools
-import inspect
 import logging
+import inspect
+import functools
 import os
+from yacs.config import CfgNode as CN
 import shutil
 import warnings
 from collections.abc import Iterable
 from dataclasses import asdict
 from typing import Any
 
-import torch_geometric.graphgym.register as register
 from torch_geometric.data.makedirs import makedirs
+import torch_geometric.graphgym.register as register
 
-try:  # Define global config object
-    from yacs.config import CfgNode as CN
-    cfg = CN()
-except ImportError:
-    cfg = None
-    warnings.warn("Could not define global config object. Please install "
-                  "'yacs' for using the GraphGym experiment manager via "
-                  "'pip install yacs'.")
+# Global config object
+cfg = CN()
 
 
 def set_cfg(cfg):
@@ -31,8 +26,6 @@ def set_cfg(cfg):
 
     :return: configuration use by the experiment.
     '''
-    if cfg is None:
-        return cfg
 
     # ----------------------------------------------------------------------- #
     # Basic options
@@ -103,11 +96,11 @@ def set_cfg(cfg):
     # Size of out dimension, i.e., number of labels to be predicted
     cfg.share.dim_out = 1
 
-    # Number of tasks, e.g., for multitask binary classification
-    cfg.share.num_tasks = 1 # my addition
-
     # Number of dataset splits: train/val/test
     cfg.share.num_splits = 1
+
+    # Number of tasks, e.g., for multitask binary classification
+    cfg.share.num_tasks = 1 # my addition
 
     # ----------------------------------------------------------------------- #
     # Dataset options
@@ -226,9 +219,32 @@ def set_cfg(cfg):
     cfg.dataset.label_column = 'none'
 
     # ----------------------------------------------------------------------- #
+    # Snowflake options
+    # ----------------------------------------------------------------------- #
+    cfg.snowflake = CN()
+
+    # Account name
+    cfg.snowflake.account = 'EPA65780'
+
+    # User name
+    cfg.snowflake.user = 'yjxxx'
+
+    # Password
+    cfg.snowflake.password = 'Test12345'
+
+    # Warehouse name
+    cfg.snowflake.warehouse = 'SF_TUTS_WH'
+
+    # Database name
+    cfg.snowflake.database = 'Vrtex'
+
+    # ----------------------------------------------------------------------- #
     # Training options
     # ----------------------------------------------------------------------- #
     cfg.train = CN()
+
+    # Training (and validation) pipeline mode
+    cfg.train.mode = 'standard'
 
     # Total graph mini-batch size
     cfg.train.batch_size = 16
@@ -342,10 +358,10 @@ def set_cfg(cfg):
     cfg.gnn.layers_pre_mp = 0
 
     # Number of layers for message passing
-    cfg.gnn.layers_mp = 1
+    cfg.gnn.layers_mp = 2
 
     # Number of layers after message passing
-    cfg.gnn.layers_post_mp = 1 # need a head
+    cfg.gnn.layers_post_mp = 0
 
     # Hidden layer dim. Automatically set if train.auto_match = True
     cfg.gnn.dim_inner = 16
@@ -452,24 +468,6 @@ def set_cfg(cfg):
     for func in register.config_dict.values():
         func(cfg)
 
-    # ----------------------------------------------------------------------- #
-    # Misc DelayGNN options ADDED BY ME
-    # ----------------------------------------------------------------------- #
-    cfg.delay = CN()
-    
-    cfg.delay.max_k = 1000 # default to no. layers, presumably always <1000
-
-    # ----------------------------------------------------------------------- #
-    # Ring Transfer dataset options ADDED BY ME
-    # ----------------------------------------------------------------------- #
-    cfg.ring_dataset = CN()
-    
-    cfg.ring_dataset.num_nodes = 10
-    cfg.ring_dataset.num_graphs = 6000
-    cfg.ring_dataset.num_classes = 5
-    cfg.ring_dataset.beta = 1 # beta, for betaGCN. Reverts to GCN for beta=1
-    cfg.ring_dataset.fixed_alpha = False
-
 
 def assert_cfg(cfg):
     r"""Checks config values, do necessary post processing to the configs"""
@@ -532,49 +530,21 @@ def makedirs_rm_exist(dir):
     os.makedirs(dir, exist_ok=True)
 
 
-def get_fname(fname):
-    r"""
-    Extract filename from file name path
-
-    Args:
-        fname (string): Filename for the yaml format configuration file
-    """
-    fname = fname.split('/')[-1]
-    if fname.endswith('.yaml'):
-        fname = fname[:-5]
-    elif fname.endswith('.yml'):
-        fname = fname[:-4]
-    return fname
-
-
-def set_out_dir(out_dir, fname):
-    r"""
-    Create the directory for full experiment run
-
-    Args:
-        out_dir (string): Directory for output, specified in :obj:`cfg.out_dir`
-        fname (string): Filename for the yaml format configuration file
-
-    """
-    fname = get_fname(fname)
-    cfg.out_dir = os.path.join(out_dir, fname)
-    # Make output directory
-    if cfg.train.auto_resume:
-        os.makedirs(cfg.out_dir, exist_ok=True)
-    else:
-        makedirs_rm_exist(cfg.out_dir)
-
-
-def set_run_dir(out_dir):
+def set_run_dir(out_dir, fname=''):
     r"""
     Create the directory for each random seed experiment run
 
     Args:
         out_dir (string): Directory for output, specified in :obj:`cfg.out_dir`
         fname (string): Filename for the yaml format configuration file
-
+s
     """
-    cfg.run_dir = os.path.join(out_dir, str(cfg.seed))
+    fname = fname.split('/')[-1]
+    if fname.endswith('.yaml'):
+        fname = fname[:-5]
+    elif fname.endswith('.yml'):
+        fname = fname[:-4]
+    cfg.run_dir = os.path.join(out_dir, fname, str(cfg.seed))
     # Make output directory
     if cfg.train.auto_resume:
         os.makedirs(cfg.run_dir, exist_ok=True)
@@ -582,8 +552,25 @@ def set_run_dir(out_dir):
         makedirs_rm_exist(cfg.run_dir)
 
 
-set_cfg(cfg)
+def set_agg_dir(out_dir, fname):
+    r"""
+    Create the directory for aggregated results over
+    all the random seeds
 
+    Args:
+        out_dir (string): Directory for output, specified in :obj:`cfg.out_dir`
+        fname (string): Filename for the yaml format configuration file
+
+    """
+    fname = fname.split('/')[-1]
+    if fname.endswith('.yaml'):
+        fname = fname[:-5]
+    elif fname.endswith('.yml'):
+        fname = fname[:-4]
+    return os.path.join(out_dir, fname)
+
+
+set_cfg(cfg)
 
 def from_config(func):
     if inspect.isclass(func):
@@ -610,3 +597,34 @@ def from_config(func):
         return func(*args, **kwargs)
 
     return wrapper
+
+def get_fname(fname):
+    r"""
+    Extract filename from file name path
+
+    Args:
+        fname (string): Filename for the yaml format configuration file
+    """
+    fname = fname.split('/')[-1]
+    if fname.endswith('.yaml'):
+        fname = fname[:-5]
+    elif fname.endswith('.yml'):
+        fname = fname[:-4]
+    return fname
+    
+def set_out_dir(out_dir, fname):
+    r"""
+    Create the directory for full experiment run
+
+    Args:
+        out_dir (string): Directory for output, specified in :obj:`cfg.out_dir`
+        fname (string): Filename for the yaml format configuration file
+
+    """
+    fname = get_fname(fname)
+    cfg.out_dir = os.path.join(out_dir, fname)
+    # Make output directory
+    if cfg.train.auto_resume:
+        os.makedirs(cfg.out_dir, exist_ok=True)
+    else:
+        makedirs_rm_exist(cfg.out_dir)

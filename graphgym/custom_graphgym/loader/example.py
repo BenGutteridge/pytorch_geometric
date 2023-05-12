@@ -111,7 +111,9 @@ def load_ogb(format, name, dataset_dir):
         set_dataset_attr(dataset, 'test_edge_index', id_all, id_all.shape[1])
         set_dataset_attr(dataset, 'test_edge_label', label, len(label))
         
-
+    elif 'peptides' in name:
+        print('OGB-peptides dataset...')
+        return # will then move on to master_loader
     else:
         raise ValueError('OGB dataset: {} non-exist')
     return dataset

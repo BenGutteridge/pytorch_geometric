@@ -13,6 +13,11 @@ from torch_geometric.graphgym.config import cfg
 from torch_geometric.graphgym.utils.device import get_current_gpu_usage
 from torch_geometric.graphgym.utils.io import dict_to_json, dict_to_tb
 
+# for multilabel
+from torch_geometric.graphgym.utils.metric_wrapper import MetricWrapper
+import torch_geometric.graphgym.utils.metrics_ogb as metrics_ogb
+import numpy as np
+
 try:
     import pytorch_lightning as pl
     from pytorch_lightning import Callback
@@ -139,6 +144,50 @@ class Logger(object):
         pred_int = self._get_pred_int(pred_score)
         return {'accuracy': round(accuracy_score(true, pred_int), cfg.round)}
 
+    # TAKEN FROM LRGB
+    def classification_multilabel(self):
+        true, pred_score = torch.cat(self._true), torch.cat(self._pred)
+        reformat = lambda x: round(float(x), cfg.round)
+
+        # Send to GPU to speed up TorchMetrics if possible.
+        true = true.to(torch.device(cfg.accelerator))
+        pred_score = pred_score.to(torch.device(cfg.accelerator))
+        acc = MetricWrapper(metric='accuracy',
+                            target_nan_mask='ignore-mean-label',
+                            threshold=0.,
+                            cast_to_int=True)
+        ap = MetricWrapper(metric='averageprecision',
+                           target_nan_mask='ignore-mean-label',
+                           pos_label=1,
+                           cast_to_int=True)
+        auroc = MetricWrapper(metric='auroc',
+                              target_nan_mask='ignore-mean-label',
+                              pos_label=1,
+                              cast_to_int=True)
+        results = {
+            'accuracy': reformat(acc(pred_score, true)),
+            'ap': reformat(ap(pred_score, true)),
+            'auc': reformat(auroc(pred_score, true)),
+        }
+
+        if self.test_scores:
+            # Compute metric by OGB Evaluator methods.
+            true = true.cpu().numpy()
+            pred_score = pred_score.cpu().numpy()
+            ogb = {
+                'accuracy': reformat(metrics_ogb.eval_acc(
+                    true, (pred_score > 0.).astype(int))['acc']),
+                'ap': reformat(metrics_ogb.eval_ap(true, pred_score)['ap']),
+                'auc': reformat(
+                    metrics_ogb.eval_rocauc(true, pred_score)['rocauc']),
+            }
+            assert np.isclose(ogb['accuracy'], results['accuracy'])
+            assert np.isclose(ogb['ap'], results['ap'])
+            assert np.isclose(ogb['auc'], results['auc'])
+
+        return results
+
+
     def regression(self):
         from sklearn.metrics import mean_absolute_error, mean_squared_error
 
@@ -201,6 +250,8 @@ class Logger(object):
                 task_stats = self.classification_binary()
             elif self.task_type == 'classification_multi':
                 task_stats = self.classification_multi()
+            elif self.task_type == 'classification_multilabel':
+                task_stats = self.classification_multilabel()
             else:
                 raise ValueError('Task has to be regression or classification')
 

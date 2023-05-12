@@ -21,13 +21,18 @@ from torch_geometric.graphgym.utils.comp_budget import params_count
 from torch_geometric.graphgym.utils.device import auto_select_device
 
 
-argpath = '/Users/beng/Documents/pytorch_geometric/graphgym/configs/ring_transfer.yaml'
+# argpath = '/Users/beng/Documents/pytorch_geometric/graphgym/configs/ring_transfer.yaml'
 
 # argpath = '/Users/beng/Documents/pytorch_geometric/graphgym/configs/example.yaml'
 # argpath = '/Users/beng/Documents/pytorch_geometric/graphgym/configs/example_graph_copy.yaml'
 # argpath = '/Users/beng/Documents/pytorch_geometric/graphgym/configs/example_graph_2.yaml'
 # argpath = '/Users/beng/Documents/pytorch_geometric/graphgym/configs/configs_03.10/Cora_V_2MP.yaml'
 # argpath = '/Users/beng/Documents/pytorch_geometric/graphgym/configs/lrgb_peptides-func-GCN.yaml'
+
+# argpath = 'graphgym/configs/pre_dec_22/example.yaml'
+# argpath = 'graphgym/configs/post_dec_22/peptides-func-GCN.yaml'
+
+argpath = '/Users/beng/Documents/pytorch_geometric/results/ring_transfer_grid_ring_transfer_grid_GPU_DELAY/ring_transfer-num_nodes=10-layer_type=my_gcnconv-stage_type=delay_gnn-accelerator=cuda-num_workers=8/config.yaml'
 
 repeat = 1
 
@@ -45,14 +50,15 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('opts', default=None, nargs=argparse.REMAINDER,
                         help='See graphgym/config.py for remaining options.')
     extra_args = [
-        'optim.max_epoch 5',
-        'ring_dataset.num_nodes 10',
-        'dataset.transductive True',
+        'optim.max_epoch 2',
+        # 'ring_dataset.num_nodes 10',
+        # 'dataset.transductive True',
         # 'gnn.layer_type gcnconv',
-        'gnn.layer_type my_gcnconv',
-        'gnn.stage_type alpha_k_gnn',
+        # 'gnn.layer_type my_gcnconv',
+        'gnn.stage_type k_gnn',
+        # 'gnn.stage_type delay_gnn',
         # 'ring_dataset.beta 3',
-        'ring_dataset.fixed_alpha True',
+        # 'ring_dataset.fixed_alpha True',
         ]
     extra_args = ' '.join(extra_args)
     return parser.parse_args("--cfg {} --repeat {} {}".format(argpath, repeat, extra_args).split())

@@ -25,7 +25,8 @@ class GraphGymModule(LightningModule):
     def configure_optimizers(self) -> Tuple[Any, Any]:
         optimizer = create_optimizer(self.model.parameters(), self.cfg.optim)
         scheduler = create_scheduler(optimizer, self.cfg.optim)
-        return [optimizer], [scheduler]
+        # return [optimizer], [scheduler], ['metric_to_track']
+        return dict(optimizer=optimizer, lr_scheduler=scheduler, monitor='metric_to_track')
 
     def _shared_step(self, batch, split: str) -> Dict:
         batch.split = split

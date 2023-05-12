@@ -123,7 +123,9 @@ class RingTransferDataset(InMemoryDataset):
         y = torch.tensor([np.argmax(target_label)], dtype=torch.long)
         
         if cfg.gnn.stage_type in ['k_gnn', 'delay_gnn', 'delite_gnn', 'alpha_k_gnn']:
-            k_hop_edges, _ = get_k_hop_adjacencies(edge_index, cfg.delay.max_k)
+            # nu = cfg.rbar
+            max_k = cfg.gnn.layers_mp
+            k_hop_edges, _ = get_k_hop_adjacencies(edge_index, max_k)
             assert torch.mean((k_hop_edges[0] == edge_index).float())==1.0
             cutoffs = torch.tensor([v.shape[-1] for v in k_hop_edges])
             k_hop_edges = torch.cat(k_hop_edges, dim=1)
